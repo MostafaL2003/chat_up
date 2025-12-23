@@ -4,97 +4,74 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.cyan,
       brightness: Brightness.light,
-      primary: const Color.fromARGB(
-        255,
-        33,
-        150,
-        243,
-      ), // Better Blue for visibility
-      onPrimary: Colors.white, // Text on primary buttons is now white
+      primary: const Color(0xFF2196F3),
+      onPrimary: Colors.white,
       surface: Colors.white,
-      onSurface: Colors.black87, // Text on background
+      onSurface: Colors.black87,
     ),
-
     scaffoldBackgroundColor: Colors.white,
-
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.cyan[600],
+    textTheme: const TextTheme(
+      displayMedium: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+      ),
+      bodyLarge: TextStyle(fontSize: 16, color: Colors.black87),
+      bodyMedium: TextStyle(fontSize: 14, color: Colors.black54),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      labelStyle: const TextStyle(fontSize: 14),
+      hintStyle: const TextStyle(fontSize: 14),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Color(0xFF00ACC1),
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      titleTextStyle: const TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    ),
-
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Colors.cyan[600],
-      foregroundColor: Colors.white,
-    ),
-
-    // FIXED: Text was white on white background. Now it's dark grey/black.
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-        fontSize: 28,
-      ),
-      bodyMedium: TextStyle(
-        fontWeight: FontWeight.bold,
-        color: Color.fromARGB(167, 0, 0, 0),
-        fontSize: 20,
-      ),
-      bodySmall: TextStyle(
-        fontWeight: FontWeight.w500,
-        color: Colors.black54,
-        fontSize: 16,
-      ),
+      titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     ),
   );
 
   static final ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-
     colorScheme: ColorScheme.fromSeed(
       seedColor: Colors.cyan,
       brightness: Brightness.dark,
       primary: Colors.cyan[700],
       onPrimary: Colors.white,
-      surface: const Color(
-        0xFF1E1E1E,
-      ), // Slightly lighter than pure black for depth
+      surface: const Color(0xFF1E1E1E),
       onSurface: Colors.white,
     ),
-
     scaffoldBackgroundColor: const Color(0xFF121212),
-
-    appBarTheme: AppBarTheme(
-      backgroundColor: Colors.black, // Sleek dark app bar
-      foregroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-      titleTextStyle: const TextStyle(
-        fontSize: 20,
+    textTheme: const TextTheme(
+      displayMedium: TextStyle(
+        fontSize: 24,
         fontWeight: FontWeight.bold,
         color: Colors.white,
       ),
+      bodyLarge: TextStyle(fontSize: 16, color: Colors.white),
+      bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
     ),
-
-    floatingActionButtonTheme: FloatingActionButtonThemeData(
-      backgroundColor: Colors.cyan[700],
+    inputDecorationTheme: InputDecorationTheme(
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      labelStyle: const TextStyle(fontSize: 14),
+      hintStyle: const TextStyle(fontSize: 14),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
       foregroundColor: Colors.white,
-    ),
-
-    textTheme: const TextTheme(
-      bodyLarge: TextStyle(color: Colors.white),
-      bodyMedium: TextStyle(color: Colors.white70),
+      elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     ),
   );
 }

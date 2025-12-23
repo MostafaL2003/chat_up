@@ -21,7 +21,16 @@ class MyButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
-              child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color:
+                      Theme.of(context)
+                          .colorScheme
+                          .onPrimary, // This forces the text to be WHITE
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ),

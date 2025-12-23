@@ -20,7 +20,7 @@ class SignupScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: Center(
+      body: SafeArea(
         child: SingleChildScrollView(
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
@@ -34,6 +34,7 @@ class SignupScreen extends StatelessWidget {
             builder: (context, state) {
               return Column(
                 children: [
+                  SizedBox(height: 160),
                   Image.asset("assets/logo.png", height: 160),
                   SizedBox(height: 64),
 
