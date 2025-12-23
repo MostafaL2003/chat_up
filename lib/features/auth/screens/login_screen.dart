@@ -1,3 +1,5 @@
+import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
+import 'package:chat_up/features/auth/cubit/auth_state.dart';
 import 'package:chat_up/features/auth/models/user_credentials.dart';
 import 'package:chat_up/features/auth/screens/signup_screen.dart';
 import 'package:chat_up/features/auth/services/auth_service.dart';
@@ -6,6 +8,7 @@ import 'package:chat_up/features/auth/widgets/my_text_field.dart';
 import 'package:chat_up/features/chat/screens/chats_screen.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -18,63 +21,87 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 128),
-            Image.asset("assets/logo.png", height: 160),
-            SizedBox(height: 64),
-            MyTextField(
-              hintText: "Email",
-              obscureText: false,
-              controller: emailController,
-            ),
-            SizedBox(height: 16),
-            MyTextField(
-              hintText: "Password",
-              obscureText: true,
-              controller: passwordController,
-            ),
-            SizedBox(height: 16),
-            MyButton(
-              onTap: () async {
-                final user = UserCredentials(
-                  emailaddress: emailController.text,
-                  password: passwordController.text,
-                );
-                await AuthService().logIn(user);
-
-                Navigator.push(
-                  // ignore: use_build_context_synchronously
-                  context,
-                  MaterialPageRoute(builder: (context) => ChatsScreen()),
-                );
-              },
-              text: "Login",
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Dont have an account ?",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {},
-                    child: Text(
-                      "Create an account",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
+        child: BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            if (state is AuthSuccess) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChatsScreen()),
+              );
+            }
+          },
+          builder: (context, state) {
+            return Column(
+              children: [
+                SizedBox(height: 160),
+                Image.asset("assets/logo.png", height: 160),
+                SizedBox(height: 64),
+                MyTextField(
+                  errorText:
+                      (state is AuthError && state.field == "email")
+                          ? state.errorMessage
+                          : null,
+                  hintText: "Email",
+                  obscureText: false,
+                  controller: emailController,
+                ),
+                SizedBox(height: 16),
+                MyTextField(
+                  errorText:
+                      (state is AuthError && state.field == "password")
+                          ? state.errorMessage
+                          : null,
+                  hintText: "Password",
+                  obscureText: true,
+                  controller: passwordController,
+                ),
+                SizedBox(height: 16),
+                state is AuthLoading
+                    ? CircularProgressIndicator()
+                    : MyButton(
+                      onTap: () {
+                        final user = UserCredentials(
+                          emailaddress: emailController.text,
+                          password: passwordController.text,
+                        );
+                        context.read<AuthCubit>().login(user);
+                      },
+                      text: "Login",
                     ),
+                SizedBox(height: 16),
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Dont have an account ?",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () {
+                          context.read<AuthCubit>().authReset();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignupScreen(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Create an account",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
