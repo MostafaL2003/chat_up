@@ -1,10 +1,18 @@
+import 'package:chat_up/features/auth/models/user_credentials.dart';
 import 'package:chat_up/features/auth/screens/login_screen.dart';
+import 'package:chat_up/features/auth/services/auth_service.dart';
 import 'package:chat_up/features/auth/widgets/my_button.dart';
 import 'package:chat_up/features/auth/widgets/my_text_field.dart';
+import 'package:chat_up/features/chat/screens/chats_screen.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatelessWidget {
-  const SignupScreen({super.key});
+  SignupScreen({super.key});
+
+  final userNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -16,15 +24,51 @@ class SignupScreen extends StatelessWidget {
             children: [
               Image.asset("assets/logo.png", height: 160),
               SizedBox(height: 64),
-              MyTextField(hintText: "Username", obscureText: false),
+              MyTextField(
+                hintText: "Username",
+                obscureText: false,
+                controller: userNameController,
+              ),
               SizedBox(height: 16),
-              MyTextField(hintText: "Email", obscureText: false),
+              MyTextField(
+                hintText: "Email",
+                obscureText: false,
+                controller: emailController,
+              ),
               SizedBox(height: 16),
-              MyTextField(hintText: "Password", obscureText: true),
+              MyTextField(
+                hintText: "Password",
+                obscureText: true,
+                controller: passwordController,
+              ),
               SizedBox(height: 16),
-              MyTextField(hintText: "Confirm Password", obscureText: true),
+              MyTextField(
+                hintText: "Confirm Password",
+                obscureText: true,
+                controller: confirmPasswordController,
+              ),
               SizedBox(height: 16),
-              MyButton(onTap: () {}, text: "Sign up"),
+              MyButton(
+                onTap: () async {
+                  if (passwordController.text ==
+                      confirmPasswordController.text) {
+                    final user = UserCredentials(
+                      emailaddress: emailController.text,
+                      password: passwordController.text,
+                    );
+
+                    await AuthService().logIn(user);
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      MaterialPageRoute(builder: (context) => ChatsScreen()),
+                    );
+                  } else {
+                    print("NO LOGIN");
+                  }
+                },
+                text: "Sign up",
+              ),
               SizedBox(height: 16),
               Center(
                 child: Row(
@@ -38,6 +82,7 @@ class SignupScreen extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
+                          // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(
                             builder: (context) => LoginScreen(),
