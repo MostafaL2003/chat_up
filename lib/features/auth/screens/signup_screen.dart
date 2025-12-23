@@ -2,10 +2,10 @@ import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
 import 'package:chat_up/features/auth/cubit/auth_state.dart';
 import 'package:chat_up/features/auth/models/user_credentials.dart';
 import 'package:chat_up/features/auth/screens/login_screen.dart';
-import 'package:chat_up/features/auth/services/auth_service.dart';
 import 'package:chat_up/features/auth/widgets/my_button.dart';
 import 'package:chat_up/features/auth/widgets/my_text_field.dart';
-import 'package:chat_up/features/chat/screens/chats_screen.dart';
+
+import 'package:chat_up/features/profile/screens/profile_setup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,9 +25,9 @@ class SignupScreen extends StatelessWidget {
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthSuccess) {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => ChatsScreen()),
+                  MaterialPageRoute(builder: (context) => ProfileSetupScreen()),
                 );
               }
             },
@@ -38,21 +38,33 @@ class SignupScreen extends StatelessWidget {
                   SizedBox(height: 64),
 
                   MyTextField(
-                    errorText: (state is AuthError && state.field =="email")?state.errorMessage:null,
+                    prefixIcon: Icon(Icons.email_outlined),
+                    errorText:
+                        (state is AuthError && state.field == "email")
+                            ? state.errorMessage
+                            : null,
                     hintText: "Email",
                     obscureText: false,
                     controller: emailController,
                   ),
                   SizedBox(height: 16),
                   MyTextField(
-                    errorText: (state is AuthError && state.field =="password")?state.errorMessage:null,
+                    prefixIcon: Icon(Icons.lock_outline),
+                    errorText:
+                        (state is AuthError && state.field == "password")
+                            ? state.errorMessage
+                            : null,
                     hintText: "Password",
                     obscureText: true,
                     controller: passwordController,
                   ),
                   SizedBox(height: 16),
                   MyTextField(
-                    errorText: (state is AuthError && state.field =="password")?state.errorMessage:null,
+                    prefixIcon: Icon(Icons.lock_reset_rounded),
+                    errorText:
+                        (state is AuthError && state.field == "password")
+                            ? state.errorMessage
+                            : null,
                     hintText: "Confirm Password",
                     obscureText: true,
                     controller: confirmPasswordController,
@@ -80,7 +92,7 @@ class SignupScreen extends StatelessWidget {
                       children: [
                         Text(
                           "Already have an account ?",
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                         SizedBox(width: 8),
                         GestureDetector(

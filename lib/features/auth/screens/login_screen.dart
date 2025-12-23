@@ -2,7 +2,6 @@ import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
 import 'package:chat_up/features/auth/cubit/auth_state.dart';
 import 'package:chat_up/features/auth/models/user_credentials.dart';
 import 'package:chat_up/features/auth/screens/signup_screen.dart';
-import 'package:chat_up/features/auth/services/auth_service.dart';
 import 'package:chat_up/features/auth/widgets/my_button.dart';
 import 'package:chat_up/features/auth/widgets/my_text_field.dart';
 import 'package:chat_up/features/chat/screens/chats_screen.dart';
@@ -24,7 +23,7 @@ class LoginScreen extends StatelessWidget {
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthSuccess) {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => ChatsScreen()),
               );
@@ -37,6 +36,7 @@ class LoginScreen extends StatelessWidget {
                 Image.asset("assets/logo.png", height: 160),
                 SizedBox(height: 64),
                 MyTextField(
+                  prefixIcon: Icon(Icons.email_outlined),
                   errorText:
                       (state is AuthError && state.field == "email")
                           ? state.errorMessage
@@ -47,6 +47,7 @@ class LoginScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 MyTextField(
+                  prefixIcon: Icon(Icons.lock_outline),
                   errorText:
                       (state is AuthError && state.field == "password")
                           ? state.errorMessage
@@ -75,7 +76,7 @@ class LoginScreen extends StatelessWidget {
                     children: [
                       Text(
                         "Dont have an account ?",
-                        style: Theme.of(context).textTheme.bodyLarge,
+                        style: Theme.of(context).textTheme.bodySmall,
                       ),
                       SizedBox(width: 8),
                       GestureDetector(

@@ -21,7 +21,7 @@ class MyButton extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Center(
-              child: Text(text, style: Theme.of(context).textTheme.bodyLarge),
+              child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
             ),
           ),
         ),
