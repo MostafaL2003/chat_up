@@ -15,7 +15,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   File? _image;
   final ImagePicker picker = ImagePicker();
 
-  // FIXED: Now uses the 'source' variable instead of hardcoded gallery
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
@@ -62,7 +61,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ADDED: SingleChildScrollView prevents the keyboard from blocking your view
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 60.0),
@@ -119,8 +117,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         onPressed: showImagePickerOptions,
                         icon: Icon(
                           Icons.camera_alt_rounded,
-                          size:
-                              40, // Slightly smaller size looks better inside the container
+                          size: 40,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
@@ -132,9 +129,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               const MyTextField(
                 hintText: "Username",
                 obscureText: false,
-                prefixIcon: Icon(
-                  Icons.person_outline,
-                ), // FIXED: Passed as IconData
+                prefixIcon: Icon(Icons.person_outline),
               ),
               const SizedBox(height: 16),
               MyButton(onTap: () {}, text: "Save profile"),
