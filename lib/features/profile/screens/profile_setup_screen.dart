@@ -1,6 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'package:chat_up/features/auth/widgets/my_button.dart';
 import 'package:chat_up/features/auth/widgets/my_text_field.dart';
+import 'package:chat_up/features/chat/screens/chats_screen.dart';
+import 'package:chat_up/features/profile/models/user_model.dart';
+import 'package:chat_up/features/profile/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,8 +18,11 @@ class ProfileSetupScreen extends StatefulWidget {
 }
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
+  final TextEditingController _usernameController = TextEditingController();
   File? _image;
   final ImagePicker picker = ImagePicker();
+  bool _isLoading = false;
+  final DatabaseService _databaseService = DatabaseService();
 
   Future<void> pickImage(ImageSource source) async {
     final XFile? pickedFile = await picker.pickImage(source: source);
@@ -66,10 +75,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 60.0),
           child: Column(
             children: [
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
               Text(
                 "Complete Your Profile",
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 8),
               Text(
@@ -81,18 +90,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 alignment: Alignment.center,
                 children: [
                   CircleAvatar(
-                    radius: 148,
+                    radius: 78,
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   CircleAvatar(
                     backgroundImage:
                         (_image == null ? null : FileImage(_image!)),
-                    radius: 140,
+                    radius: 74,
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    child:
-                        _image == null
-                            ? const Icon(Icons.person, size: 150)
-                            : null,
+                    child: _image == null
+                        ? const Icon(Icons.person, size: 80)
+                        : null,
                   ),
                   Positioned(
                     bottom: 0,
@@ -103,21 +111,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         color: Theme.of(context).colorScheme.surface,
                         border: Border.all(
                           color: Theme.of(context).scaffoldBackgroundColor,
-                          width: 4,
+                          width: 3,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 1,
-                            blurRadius: 10,
-                          ),
-                        ],
                       ),
                       child: IconButton(
                         onPressed: showImagePickerOptions,
                         icon: Icon(
                           Icons.camera_alt_rounded,
-                          size: 40,
+                          size: 24,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       ),
@@ -126,13 +127,72 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                 ],
               ),
               const SizedBox(height: 32),
-              const MyTextField(
+              MyTextField(
+                controller: _usernameController,
                 hintText: "Username",
                 obscureText: false,
-                prefixIcon: Icon(Icons.person_outline),
+                prefixIcon: const Icon(Icons.person_outline),
               ),
-              const SizedBox(height: 16),
-              MyButton(onTap: () {}, text: "Save profile"),
+              const SizedBox(height: 32),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : MyButton(
+                      text: "Save Profile",
+                      onTap: () async {
+                        if (_image == null ||
+                            _usernameController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text("Please add a photo and a username")),
+                          );
+                          return;
+                        }
+
+                        setState(() => _isLoading = true);
+
+                        try {
+                          bool unique = await _databaseService.isUsernameUnique(
+                            _usernameController.text.trim(),
+                          );
+
+                          if (!unique) {
+                            setState(() => _isLoading = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Username already taken!")),
+                            );
+                            return;
+                          }
+
+                          final String uid =
+                              FirebaseAuth.instance.currentUser!.uid;
+                          String downloadUrl = await _databaseService
+                              .getImageUrl(_image!, uid);
+
+                          UserModel newUser = UserModel(
+                            uid: uid,
+                            username: _usernameController.text.trim(),
+                            imageUrl: downloadUrl,
+                          );
+
+                          await _databaseService.saveUserInfo(newUser);
+
+                          if (mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ChatsScreen(),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setState(() => _isLoading = false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error: $e")));
+                        }
+                      },
+                    ),
             ],
           ),
         ),
