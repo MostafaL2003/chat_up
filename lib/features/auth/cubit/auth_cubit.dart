@@ -1,5 +1,6 @@
 import 'package:chat_up/features/auth/cubit/auth_state.dart';
 import 'package:chat_up/features/auth/services/auth_service.dart';
+import 'package:chat_up/features/profile/models/user_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -9,58 +10,50 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(dynamic credentials) async {
     emit(AuthLoading());
     try {
-      await AuthService().logIn(credentials);
-      emit(AuthSuccess());
+      UserCredential userCred = await AuthService().logIn(credentials);
+      UserModel user = await AuthService().getUserData(userCred.user!.uid);
+      emit(AuthSuccess(userModel: user));
     } on FirebaseAuthException catch (e) {
-      // 1. Handle Email errors
-      if (e.code == 'invalid-email' || e.code == 'user-not-found') {
-        emit(
-          AuthError(errorMessage: "Check your email address", field: "email"),
-        );
-      }
-      // 2. Handle Password/General Credential errors
-      else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-        emit(AuthError(errorMessage: "Incorrect password", field: "password"));
-      }
-      // 3. Catch-all for the rest (Network, Too many attempts, etc.)
-      else {
-        emit(
-          AuthError(
-            errorMessage: e.message ?? "Authentication failed",
-            field: '',
-          ),
-        );
-      }
+      _handleFirebaseError(e);
     } catch (e) {
-      // Safety net for non-Firebase errors
-      emit(AuthError(errorMessage: "An unexpected error occurred", field: ''));
+      emit(AuthError(errorMessage: e.toString(), field: ''));
     }
   }
 
   Future<void> signUp(dynamic credentials) async {
     emit(AuthLoading());
     try {
-      await AuthService().signUp(credentials);
-      emit(AuthSuccess());
+      UserCredential userCred = await AuthService().signUp(credentials);
+      UserModel user = await AuthService().getUserData(userCred.user!.uid);
+      emit(AuthSuccess(userModel: user));
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        emit(
-          AuthError(
-            errorMessage: "This email is already registered",
-            field: "email",
-          ),
-        );
-      } else if (e.code == 'weak-password') {
-        emit(
-          AuthError(errorMessage: "Password is too weak", field: "password"),
-        );
-      } else if (e.code == 'invalid-email') {
-        emit(AuthError(errorMessage: "Invalid email format", field: "email"));
-      } else {
-        emit(AuthError(errorMessage: e.message ?? "Sign up failed", field: ''));
-      }
+      _handleFirebaseError(e);
     } catch (e) {
-      emit(AuthError(errorMessage: "Something went wrong", field: ''));
+      emit(AuthError(errorMessage: e.toString(), field: ''));
+    }
+  }
+
+  void _handleFirebaseError(FirebaseAuthException e) {
+    if (e.code == 'invalid-email' ||
+        e.code == 'user-not-found' ||
+        e.code == 'email-already-in-use') {
+      emit(AuthError(errorMessage: e.message ?? "Email error", field: "email"));
+    } else if (e.code == 'wrong-password' ||
+        e.code == 'invalid-credential' ||
+        e.code == 'weak-password') {
+      emit(
+        AuthError(
+          errorMessage: e.message ?? "Password error",
+          field: "password",
+        ),
+      );
+    } else {
+      emit(
+        AuthError(
+          errorMessage: e.message ?? "Authentication failed",
+          field: '',
+        ),
+      );
     }
   }
 

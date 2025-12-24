@@ -28,6 +28,11 @@ class LoginScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => ChatsScreen()),
               );
             }
+            else if (state is AuthError) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red),
+    );
+  }
           },
           builder: (context, state) {
             return Column(
