@@ -41,6 +41,7 @@ dependencies:
   cloudinary_public: ^0.23.1
   cloud_firestore:
   firebase_storage: 
+  intl: 
 
 dev_dependencies:
   flutter_test:

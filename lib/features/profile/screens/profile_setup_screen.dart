@@ -98,9 +98,10 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         (_image == null ? null : FileImage(_image!)),
                     radius: 74,
                     backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                    child: _image == null
-                        ? const Icon(Icons.person, size: 80)
-                        : null,
+                    child:
+                        _image == null
+                            ? const Icon(Icons.person, size: 80)
+                            : null,
                   ),
                   Positioned(
                     bottom: 0,
@@ -137,62 +138,66 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               _isLoading
                   ? const CircularProgressIndicator()
                   : MyButton(
-                      text: "Save Profile",
-                      onTap: () async {
-                        if (_image == null ||
-                            _usernameController.text.trim().isEmpty) {
+                    text: "Save Profile",
+                    onTap: () async {
+                      if (_image == null ||
+                          _usernameController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please add a photo and a username"),
+                          ),
+                        );
+                        return;
+                      }
+
+                      setState(() => _isLoading = true);
+
+                      try {
+                        bool unique = await _databaseService.isUsernameUnique(
+                          _usernameController.text.trim(),
+                        );
+
+                        if (!unique) {
+                          setState(() => _isLoading = false);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                                content:
-                                    Text("Please add a photo and a username")),
+                              content: Text("Username already taken!"),
+                            ),
                           );
                           return;
                         }
 
-                        setState(() => _isLoading = true);
+                        final String uid =
+                            FirebaseAuth.instance.currentUser!.uid;
+                        String downloadUrl = await _databaseService.getImageUrl(
+                          _image!,
+                          uid,
+                        );
 
-                        try {
-                          bool unique = await _databaseService.isUsernameUnique(
-                            _usernameController.text.trim(),
+                        UserModel newUser = UserModel(
+                          uid: uid,
+                          username: _usernameController.text.trim(),
+                          imageUrl: downloadUrl,
+                        );
+
+                        await _databaseService.saveUserInfo(newUser);
+
+                        if (mounted) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatScreen(),
+                            ),
                           );
-
-                          if (!unique) {
-                            setState(() => _isLoading = false);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Username already taken!")),
-                            );
-                            return;
-                          }
-
-                          final String uid =
-                              FirebaseAuth.instance.currentUser!.uid;
-                          String downloadUrl = await _databaseService
-                              .getImageUrl(_image!, uid);
-
-                          UserModel newUser = UserModel(
-                            uid: uid,
-                            username: _usernameController.text.trim(),
-                            imageUrl: downloadUrl,
-                          );
-
-                          await _databaseService.saveUserInfo(newUser);
-
-                          if (mounted) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ChatsScreen(),
-                              ),
-                            );
-                          }
-                        } catch (e) {
-                          setState(() => _isLoading = false);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error: $e")));
                         }
-                      },
-                    ),
+                      } catch (e) {
+                        setState(() => _isLoading = false);
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                      }
+                    },
+                  ),
             ],
           ),
         ),

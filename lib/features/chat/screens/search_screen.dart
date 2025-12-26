@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
 import 'package:chat_up/features/chat/services/chat_service.dart';
 import 'package:chat_up/features/auth/cubit/auth_state.dart';
@@ -107,15 +109,17 @@ class _SearchScreenState extends State<SearchScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: ChatService().getFriendRequests(),
               builder: (context, snapshot) {
-                if (snapshot.hasError)
+                if (snapshot.hasError) {
                   return const Center(child: Text("Error"));
+                }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
                 final docs = snapshot.data!.docs;
-                if (docs.isEmpty)
+                if (docs.isEmpty) {
                   return const Center(child: Text('No requests'));
+                }
 
                 return ListView.builder(
                   itemCount: docs.length,
@@ -124,14 +128,19 @@ class _SearchScreenState extends State<SearchScreen> {
                     return MyListTile(
                       username: data['senderUsername'] ?? 'User',
                       imageUrl: data['senderImageUrl'] ?? '',
-                      onAccept: () {},
+                      onAccept: () async {
+                        final data = docs[index].data() as Map<String, dynamic>;
+                        final requestId = docs[index].id;
+                        final senderId = data['senderId'];
+
+                        await ChatService().acceptFriendRequest(
+                          requestId,
+                          senderId,
+                        );
+                      },
                       onDecline: () async {
                         try {
-                          // This deletes the document from the 'friend_requests' collection
-                          await FirebaseFirestore.instance
-                              .collection('friend_requests')
-                              .doc(docs[index].id)
-                              .delete();
+                          ChatService().declineFriendRequest;
 
                           if (mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(

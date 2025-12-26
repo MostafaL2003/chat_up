@@ -1,6 +1,8 @@
 import 'package:chat_up/features/auth/cubit/auth_state.dart';
+import 'package:chat_up/features/auth/screens/login_screen.dart';
 import 'package:chat_up/features/auth/services/auth_service.dart';
 import 'package:chat_up/features/profile/models/user_model.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -59,5 +61,20 @@ class AuthCubit extends Cubit<AuthState> {
 
   void authReset() {
     emit(AuthInit());
+  }
+
+  Future<void> logOut(BuildContext context) async {
+    emit(AuthLoading());
+    try {
+
+    
+      await AuthService().signOut();
+      emit(AuthInit());
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (context) => LoginScreen()));
+    } catch (e) {
+      emit(AuthError(errorMessage: e.toString(), field: ''));
+    }
   }
 }

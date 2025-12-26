@@ -25,14 +25,16 @@ class LoginScreen extends StatelessWidget {
             if (state is AuthSuccess) {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => ChatsScreen()),
+                MaterialPageRoute(builder: (context) => ChatScreen()),
+              );
+            } else if (state is AuthError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage),
+                  backgroundColor: Colors.red,
+                ),
               );
             }
-            else if (state is AuthError) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(state.errorMessage), backgroundColor: Colors.red),
-    );
-  }
           },
           builder: (context, state) {
             return Column(
