@@ -26,6 +26,7 @@ The application is designed using clean architecture principles and reactive sta
   <img src="screenshots/profile_setup.png" width="220"/>
   <img src="screenshots/chats.png" width="220"/>
   <img src="screenshots/friends.png" width="220"/>
+  <img src="screenshots/chat_room.png" width="220"/>
 </p>
 
 ---
