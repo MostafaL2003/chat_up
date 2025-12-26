@@ -17,7 +17,6 @@ class DatabaseService {
       CloudinaryFile.fromFile(
         imageFile.path,
         folder: 'profile-pics',
-        publicId: uid,
       ),
     );
 

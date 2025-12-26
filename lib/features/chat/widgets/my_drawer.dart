@@ -1,14 +1,13 @@
-import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
-import 'package:chat_up/features/auth/cubit/auth_state.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MyDrawer extends StatelessWidget {
   final VoidCallback? onProfileSettings;
   final VoidCallback? onSecondAction;
   final VoidCallback? onLogout;
 
-  const MyDrawer({
+  MyDrawer({
     super.key,
     this.onProfileSettings,
     this.onSecondAction,
@@ -17,14 +16,25 @@ class MyDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
     return Drawer(
-      child: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
+      child: StreamBuilder<DocumentSnapshot>(
+        stream:
+            uid != null
+                ? FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(uid)
+                    .snapshots()
+                : null,
+        builder: (context, snapshot) {
           String username = "User";
           String imageUrl = "";
-          if (state is AuthSuccess) {
-            username = state.userModel.username;
-            imageUrl = state.userModel.imageUrl;
+
+          if (snapshot.hasData && snapshot.data!.exists) {
+            final data = snapshot.data!.data() as Map<String, dynamic>;
+            username = data['username'] ?? "User";
+            imageUrl = data['imageUrl'] ?? "";
           }
 
           return Column(
@@ -35,9 +45,17 @@ class MyDrawer extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
+                      key: UniqueKey(),
                       radius: 36,
                       backgroundImage:
-                          imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
+                          imageUrl.isNotEmpty
+                              ? NetworkImage(
+                                imageUrl +
+                                    "?t=" +
+                                    DateTime.now().millisecondsSinceEpoch
+                                        .toString(),
+                              )
+                              : null,
                       child:
                           imageUrl.isEmpty
                               ? Icon(
@@ -50,7 +68,7 @@ class MyDrawer extends StatelessWidget {
                               )
                               : null,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Text(
                       username,
                       style: Theme.of(context).textTheme.titleMedium,
@@ -80,9 +98,9 @@ class MyDrawer extends StatelessWidget {
                 ),
                 onTap: onSecondAction,
               ),
-              const Spacer(),
+              Spacer(),
               Padding(
-                padding: const EdgeInsets.only(bottom: 16.0),
+                padding: EdgeInsets.only(bottom: 16.0),
                 child: ListTile(
                   leading: Icon(
                     Icons.logout,

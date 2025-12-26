@@ -1,6 +1,7 @@
 import 'package:chat_up/features/auth/cubit/auth_cubit.dart';
 import 'package:chat_up/features/chat/widgets/my_drawer.dart';
 import 'package:chat_up/features/chat/widgets/friend_tile.dart';
+import 'package:chat_up/features/profile/screens/profile_setup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'search_screen.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -32,8 +38,14 @@ class ChatScreen extends StatelessWidget {
       ),
       drawer: MyDrawer(
         onProfileSettings: () {
-          // TODO: Implement navigation to profile settings if needed
-        },
+  Navigator.pop(context);
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) =>  ProfileSetupScreen(isEditing: true)),
+  ).then((_) {
+    setState(() {});
+  });
+},
         onSecondAction: () {
           Navigator.pop(context);
           Navigator.of(

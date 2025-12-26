@@ -9,6 +9,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInit());
 
+  // Added this so the app knows the user data changed
+  void updateUser(UserModel user) {
+    emit(AuthSuccess(userModel: user));
+  }
+
   Future<void> login(dynamic credentials) async {
     emit(AuthLoading());
     try {
@@ -66,8 +71,6 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> logOut(BuildContext context) async {
     emit(AuthLoading());
     try {
-
-    
       await AuthService().signOut();
       emit(AuthInit());
       Navigator.of(
