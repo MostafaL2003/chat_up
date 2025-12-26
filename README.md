@@ -20,32 +20,44 @@ The application is designed using clean architecture principles and reactive sta
 ---
 
 ## 🧭 Screens
-![Login](screenshots/login.png)
-![Profile Setup](screenshots/profile_setup.png)
-![Chats](screenshots/chats.png)
-![Friends](screenshots/friends.png)
+
+<p align="center">
+  <img src="screenshots/login.png" width="220"/>
+  <img src="screenshots/profile_setup.png" width="220"/>
+  <img src="screenshots/chats.png" width="220"/>
+  <img src="screenshots/friends.png" width="220"/>
+</p>
 
 ---
 
 ## 🛠 Tech Stack
-- **Flutter (Dart)**
-- **State Management:** Bloc / Cubit
-- **Backend:** Firebase Firestore
-- **Authentication:** Firebase Auth
-- **Image Hosting:** Cloudinary
+
+### Frontend
+- Flutter (Dart)
+- Bloc / Cubit (State Management)
+
+### Backend & Services
+- Firebase Authentication
+- Firebase Firestore (NoSQL, Real-time Database)
+- Cloudinary (Profile Image Hosting)
+
+### Tools
+- Git & GitHub
+- VS Code
+- Firebase Console
 
 ---
 
-## 🧠 Architecture
-- Clean Architecture (UI / Business Logic / Data)
-- Firestore Streams for real-time updates
-- Bloc/Cubit for predictable state handling
-- Modular widgets for scalability
+## 🧠 Architecture & Design
+- Clean Architecture separation (UI, Business Logic, Data)
+- Firestore Streams for real-time synchronization
+- Bloc/Cubit for predictable and testable state management
+- Modular and reusable UI components
 
 ---
 
 ## 🚀 Getting Started
-```bash
-git clone https://github.com/MostafaL2003/chatup.git
-flutter pub get
-flutter run
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/MostafaL2003/chatup.git
